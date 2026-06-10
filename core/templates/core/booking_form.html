@@ -1,0 +1,71 @@
+{% extends 'core/base.html' %}
+{% block title %}Book Bus{% endblock %}
+{% block page_title %}Book Your Seat{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <!-- Bus Info -->
+    <div class="card p-4 mb-4 border-start border-success border-4">
+      <h6 class="text-muted mb-2">Selected Bus</h6>
+      <h5 class="fw-bold">{{ bus.route_from }} → {{ bus.route_to }}</h5>
+      <div class="row text-muted small mt-2">
+        <div class="col-6"><i class="bi bi-bus-front me-1"></i>{{ bus.bus_number }}</div>
+        <div class="col-6"><i class="bi bi-calendar me-1"></i>{{ bus.departure_time|date:"d M Y, H:i" }}</div>
+        <div class="col-6 mt-1"><i class="bi bi-people me-1"></i>{{ bus.available_seats }} seats left</div>
+        <div class="col-6 mt-1"><i class="bi bi-tag me-1"></i>RM {{ bus.price }} / seat</div>
+      </div>
+    </div>
+
+    <!-- Booking Form -->
+    <div class="card p-4">
+      <h6 class="fw-bold mb-3">Passenger Details</h6>
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Full Name (as per IC)</label>
+          <input type="text" name="passenger_name" class="form-control {% if form.passenger_name.errors %}is-invalid{% endif %}"
+                 value="{{ form.passenger_name.value|default:'' }}" maxlength="150" required placeholder="e.g. Ahmad bin Abdullah">
+          {% if form.passenger_name.errors %}<div class="invalid-feedback">{{ form.passenger_name.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">IC / Passport Number</label>
+          <input type="text" name="passenger_ic" class="form-control {% if form.passenger_ic.errors %}is-invalid{% endif %}"
+                 value="{{ form.passenger_ic.value|default:'' }}" maxlength="20" required placeholder="e.g. 990101011234">
+          {% if form.passenger_ic.errors %}<div class="invalid-feedback">{{ form.passenger_ic.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Number of Seats</label>
+          <input type="number" name="seat_count" class="form-control {% if form.seat_count.errors %}is-invalid{% endif %}"
+                 value="{{ form.seat_count.value|default:'1' }}" min="1" max="10" required id="seatInput">
+          {% if form.seat_count.errors %}<div class="invalid-feedback">{{ form.seat_count.errors.0 }}</div>{% endif %}
+        </div>
+
+        <div class="alert alert-light border py-2 small" id="pricePreview">
+          <i class="bi bi-calculator me-1"></i>
+          Estimated Total: <strong id="totalPrice">RM {{ bus.price }}</strong>
+        </div>
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger py-2 small">{{ form.non_field_errors.0 }}</div>
+        {% endif %}
+
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-success">
+            <i class="bi bi-check-circle me-2"></i>Confirm Booking
+          </button>
+          <a href="{% url 'available_buses' %}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  const price = {{ bus.price }};
+  document.getElementById('seatInput').addEventListener('input', function() {
+    const seats = parseInt(this.value) || 1;
+    document.getElementById('totalPrice').textContent = 'RM ' + (price * seats).toFixed(2);
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends 'core/base.html' %}
+{% block title %}My Profile{% endblock %}
+{% block page_title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  <div class="col-md-4">
+    <div class="card p-4 text-center">
+      {% if user.profile_picture %}
+        <img src="{{ user.profile_picture.url }}" class="rounded-circle mx-auto mb-3" style="width:90px;height:90px;object-fit:cover" alt="Profile">
+      {% else %}
+        <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center mx-auto mb-3" style="width:90px;height:90px">
+          <i class="bi bi-person-fill text-white" style="font-size:2.5rem"></i>
+        </div>
+      {% endif %}
+      <h5 class="fw-bold">{{ user.get_full_name|default:user.username }}</h5>
+      <span class="badge bg-{% if user.is_admin %}danger{% else %}primary{% endif %}">{{ user.role }}</span>
+      <hr>
+      <div class="text-start small text-muted">
+        <p class="mb-1"><i class="bi bi-person me-2"></i>{{ user.username }}</p>
+        <p class="mb-1"><i class="bi bi-envelope me-2"></i>{{ user.email }}</p>
+        <p class="mb-1"><i class="bi bi-phone me-2"></i>{{ user.phone_number|default:"Not set" }}</p>
+        <p class="mb-0"><i class="bi bi-calendar me-2"></i>Joined {{ user.created_at|date:"d M Y" }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-8">
+    <div class="card p-4">
+      <h6 class="fw-bold mb-3">Update Profile</h6>
+      <form method="post" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        <div class="row g-3">
+          <div class="col-6">
+            <label class="form-label fw-semibold">First Name</label>
+            <input type="text" name="first_name" class="form-control {% if form.first_name.errors %}is-invalid{% endif %}"
+                   value="{{ user.first_name }}" maxlength="150">
+            {% if form.first_name.errors %}<div class="invalid-feedback">{{ form.first_name.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="col-6">
+            <label class="form-label fw-semibold">Last Name</label>
+            <input type="text" name="last_name" class="form-control {% if form.last_name.errors %}is-invalid{% endif %}"
+                   value="{{ user.last_name }}" maxlength="150">
+            {% if form.last_name.errors %}<div class="invalid-feedback">{{ form.last_name.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold">Phone Number</label>
+            <input type="text" name="phone_number" class="form-control {% if form.phone_number.errors %}is-invalid{% endif %}"
+                   value="{{ user.phone_number }}" placeholder="0123456789" maxlength="15">
+            {% if form.phone_number.errors %}<div class="invalid-feedback">{{ form.phone_number.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold">Profile Picture <small class="text-muted">(JPG/PNG, max 2MB)</small></label>
+            <input type="file" name="profile_picture" class="form-control {% if form.profile_picture.errors %}is-invalid{% endif %}"
+                   accept=".jpg,.jpeg,.png">
+            {% if form.profile_picture.errors %}<div class="invalid-feedback">{{ form.profile_picture.errors.0 }}</div>{% endif %}
+          </div>
+        </div>
+        <button type="submit" class="btn btn-success mt-3">
+          <i class="bi bi-save me-2"></i>Save Changes
+        </button>
+      </form>
+    </div>
+
+    <div class="alert alert-info mt-3 small py-2">
+      <i class="bi bi-shield-check me-1"></i>
+      Profile updates are logged in the audit system. File uploads are validated by MIME type and renamed to UUID.
+    </div>
+  </div>
+</div>
+{% endblock %}

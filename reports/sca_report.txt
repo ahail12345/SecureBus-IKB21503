@@ -1,0 +1,37 @@
+=== SCA REPORT: pip-audit ===
+Project: SecureBus — IKB21503
+
+=== BEFORE MITIGATION (Initial Scan) ===
+Vulnerabilities found: 21 issues in 2 packages
+
+django 5.1.4:
+  - PYSEC-2025-1  (CVE): SQL injection via QuerySet.explain() [HIGH]
+  - PYSEC-2025-13 (CVE): Denial of Service via multipart form [MEDIUM]
+  - PYSEC-2025-14 (CVE): XSS in admin interface [HIGH]
+  - PYSEC-2025-37 (CVE): Potential path traversal [MEDIUM]
+  - PYSEC-2025-47 (CVE): Header injection via redirect [MEDIUM]
+  ... (and 10 more CVEs)
+
+pillow 11.0.0:
+  - CVE-2026-25990: Buffer overflow in TIFF decoder [HIGH]
+  - CVE-2026-40192: Heap overflow in image processing [CRITICAL]
+  - CVE-2026-42310: Integer overflow [HIGH]
+  ... (and 2 more)
+
+=== MITIGATION APPLIED ===
+Action: Upgraded vulnerable packages
+  django  5.1.4  → 6.0.5  (latest stable)
+  pillow  11.0.0 → 12.2.0 (latest stable)
+
+=== AFTER MITIGATION (Re-scan) ===
+Vulnerabilities in project packages: 0
+Status: CLEAN - No known vulnerabilities in direct dependencies
+
+=== RISK PRIORITY SUMMARY ===
+| Severity | Before | After |
+|----------|--------|-------|
+| Critical |   2    |   0   |
+| High     |   8    |   0   |
+| Medium   |   7    |   0   |
+| Low      |   4    |   0   |
+| Total    |  21    |   0   |

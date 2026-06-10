@@ -1,0 +1,56 @@
+{% extends 'core/base.html' %}
+{% block title %}{{ action }} Bus{% endblock %}
+{% block page_title %}{{ action }} Bus{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card p-4">
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="row g-3">
+          {% for field in form %}
+          <div class="col-{% if field.name == 'is_active' %}12{% else %}6{% endif %}">
+            <label class="form-label fw-semibold">{{ field.label }}</label>
+            {% if field.name == 'is_active' %}
+              <div class="form-check">
+                {{ field }}
+                <label class="form-check-label" for="{{ field.id_for_label }}">Bus is active and bookable</label>
+              </div>
+            {% else %}
+              <input type="{{ field.field.widget.input_type|default:'text' }}"
+                     name="{{ field.html_name }}"
+                     id="{{ field.id_for_label }}"
+                     class="form-control {% if field.errors %}is-invalid{% endif %}"
+                     value="{{ field.value|default:'' }}"
+                     {% if field.field.required %}required{% endif %}>
+            {% endif %}
+            {% if field.errors %}
+              <div class="invalid-feedback">{{ field.errors.0 }}</div>
+            {% endif %}
+          </div>
+          {% endfor %}
+
+          {% if form.non_field_errors %}
+          <div class="col-12">
+            <div class="alert alert-danger py-2">{{ form.non_field_errors.0 }}</div>
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+          <button type="submit" class="btn btn-success">
+            <i class="bi bi-check-circle me-2"></i>{{ action }} Bus
+          </button>
+          <a href="{% url 'bus_list' %}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+
+    <div class="alert alert-info mt-3 py-2 small">
+      <i class="bi bi-shield-check me-1"></i>
+      All inputs are validated server-side with whitelisting (OWASP ASVS V5).
+    </div>
+  </div>
+</div>
+{% endblock %}

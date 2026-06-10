@@ -1,0 +1,16 @@
+# Core — Django 4.2 LTS supports Python 3.8, 3.9, 3.10, 3.11, 3.12
+Django==4.2.23
+django-environ==0.11.2
+
+# Security
+django-axes==6.5.1
+bcrypt==4.0.1
+python-magic-bin==0.4.14; sys_platform == 'win32'
+python-magic==0.4.27; sys_platform != 'win32'
+
+# Utilities
+Pillow==10.4.0
+
+# Dev / Testing & Analysis
+bandit==1.7.9
+pip-audit==2.7.3

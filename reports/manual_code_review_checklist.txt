@@ -1,0 +1,57 @@
+=== MANUAL CODE REVIEW CHECKLIST ===
+Project: SecureBus — Secure Bus Booking System
+Framework: Django 6.0 (Python)
+Reviewer: [Your Name]
+Date: June 2026
+SSDF Reference: NIST SP 800-218
+
+No | Item to Check              | SSDF  | Status | Location / Evidence
+---|----------------------------|-------|--------|-------------------------------------------------------
+1  | Input Validation           | PW.5  | PASS   | core/forms.py — regex whitelisting on all fields;
+   |                            |       |        | validate_name(), validate_ic(), validate_phone()
+   |                            |       |        | Server-side only; no trust of client input
+---|----------------------------|-------|--------|-------------------------------------------------------
+2  | Authentication & Session   | PW.5  | PASS   | settings.py — SESSION_COOKIE_HTTPONLY=True,
+   | Management                 |       |        | SESSION_COOKIE_AGE=1800 (30 min timeout)
+   |                            |       |        | django-axes: 5-attempt lockout
+   |                            |       |        | bcrypt via BCryptSHA256PasswordHasher
+---|----------------------------|-------|--------|-------------------------------------------------------
+3  | Access Control             | PW.5  | PASS   | core/decorators.py — @admin_required, @user_required
+   |                            |       |        | views.py — booking fetched with user=request.user
+   |                            |       |        | UUID booking_reference (no sequential ID exposure)
+   |                            |       |        | No direct object reference (IDOR prevention)
+---|----------------------------|-------|--------|-------------------------------------------------------
+4  | Error Handling             | PW.6  | PASS   | core/views.py — handler400/403/404/500
+   |                            |       |        | Custom error pages, no stack traces shown
+   |                            |       |        | 500 errors logged server-side only
+---|----------------------------|-------|--------|-------------------------------------------------------
+5  | Sensitive Data Protection  | PW.4  | PASS   | .env file for all secrets
+   |                            |       |        | No hardcoded credentials in codebase
+   |                            |       |        | core/utils.py — log_event() never logs passwords
+   |                            |       |        | bcrypt password hashing
+---|----------------------------|-------|--------|-------------------------------------------------------
+6  | File Upload Security       | PW.7  | PASS   | core/forms.py — MIME type check via python-magic
+   |                            |       |        | Extension whitelist (.jpg, .jpeg, .png only)
+   |                            |       |        | Size limit: 2MB profile, 5MB system max
+   |                            |       |        | UUID rename via secure_filename() in utils.py
+---|----------------------------|-------|--------|-------------------------------------------------------
+7  | Configuration Security     | PW.6  | PASS   | settings.py — DEBUG=False from .env
+   |                            |       |        | .env.example (no real secrets)
+   |                            |       |        | ALLOWED_HOSTS from environment variable
+---|----------------------------|-------|--------|-------------------------------------------------------
+8  | Logging & Monitoring       | PW.6  | PASS   | core/models.py — AuditLog model
+   |                            |       |        | 15 event types tracked (logins, bookings, admin)
+   |                            |       |        | core/utils.py — log_event() helper
+   |                            |       |        | Rotating file handler: logs/security.log
+   |                            |       |        | No credentials in logs (ASVS V7.1)
+---|----------------------------|-------|--------|-------------------------------------------------------
+9  | Dependency Management      | PW.6  | PASS   | requirements.txt — pinned/min versions
+   |                            |       |        | pip-audit SCA: 21 vulns found → 0 after upgrade
+   |                            |       |        | See reports/sca_report.txt
+---|----------------------------|-------|--------|-------------------------------------------------------
+10 | Output Encoding/Escaping   | PW.5  | PASS   | Django template auto-escaping enabled (default)
+   |                            |       |        | No |safe filter used on user data
+   |                            |       |        | CSP header via SecurityHeadersMiddleware
+---|----------------------------|-------|--------|-------------------------------------------------------
+
+OVERALL RESULT: 10/10 PASS

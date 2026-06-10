@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register — SecureBus</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body { background: linear-gradient(135deg,#1a2332 0%,#2d3f55 100%); min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem 0; }
+    .auth-card { background:#fff; border-radius:16px; padding:2.5rem; width:100%; max-width:500px; box-shadow:0 20px 60px rgba(0,0,0,.3); }
+    .req-list li { font-size:.8rem; color:#6c757d; }
+    .req-list li.valid { color:#198754; }
+  </style>
+</head>
+<body>
+  <div class="auth-card">
+    <div class="text-center mb-4">
+      <i class="bi bi-person-plus-fill text-success" style="font-size:2.5rem"></i>
+      <h4 class="mt-2 fw-bold">Create Account</h4>
+    </div>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="row g-3">
+        <div class="col-6">
+          <label class="form-label fw-semibold">First Name</label>
+          <input type="text" name="first_name" class="form-control {% if form.first_name.errors %}is-invalid{% endif %}" value="{{ form.first_name.value|default:'' }}" maxlength="150" required>
+          {% if form.first_name.errors %}<div class="invalid-feedback">{{ form.first_name.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-6">
+          <label class="form-label fw-semibold">Last Name</label>
+          <input type="text" name="last_name" class="form-control {% if form.last_name.errors %}is-invalid{% endif %}" value="{{ form.last_name.value|default:'' }}" maxlength="150" required>
+          {% if form.last_name.errors %}<div class="invalid-feedback">{{ form.last_name.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-semibold">Username</label>
+          <input type="text" name="username" class="form-control {% if form.username.errors %}is-invalid{% endif %}" value="{{ form.username.value|default:'' }}" maxlength="30" required>
+          {% if form.username.errors %}<div class="invalid-feedback">{{ form.username.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-semibold">Email</label>
+          <input type="email" name="email" class="form-control {% if form.email.errors %}is-invalid{% endif %}" value="{{ form.email.value|default:'' }}" maxlength="254" required>
+          {% if form.email.errors %}<div class="invalid-feedback">{{ form.email.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-semibold">Phone Number <small class="text-muted">(optional)</small></label>
+          <input type="text" name="phone_number" class="form-control {% if form.phone_number.errors %}is-invalid{% endif %}" value="{{ form.phone_number.value|default:'' }}" placeholder="0123456789" maxlength="15">
+          {% if form.phone_number.errors %}<div class="invalid-feedback">{{ form.phone_number.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-semibold">Password</label>
+          <input type="password" name="password1" id="pw1" class="form-control {% if form.password1.errors %}is-invalid{% endif %}" required>
+          {% if form.password1.errors %}<div class="invalid-feedback">{{ form.password1.errors.0 }}</div>{% endif %}
+          <ul class="req-list mt-1 ps-3" id="pwReqs">
+            <li id="r-len">At least 12 characters</li>
+            <li id="r-upper">Uppercase letter (A-Z)</li>
+            <li id="r-lower">Lowercase letter (a-z)</li>
+            <li id="r-digit">Number (0-9)</li>
+            <li id="r-special">Special character (!@#$...)</li>
+          </ul>
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-semibold">Confirm Password</label>
+          <input type="password" name="password2" class="form-control {% if form.password2.errors %}is-invalid{% endif %}" required>
+          {% if form.password2.errors %}<div class="invalid-feedback">{{ form.password2.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger mt-3 py-2 small">{{ form.non_field_errors.0 }}</div>
+      {% endif %}
+
+      <button type="submit" class="btn btn-success w-100 fw-semibold mt-4">
+        <i class="bi bi-person-check me-2"></i>Create Secure Account
+      </button>
+    </form>
+
+    <p class="text-center text-muted small mt-3 mb-0">
+      Already registered? <a href="{% url 'login' %}">Login here</a>
+    </p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Client-side password indicator (server-side is the real validator)
+    const pw = document.getElementById('pw1');
+    pw.addEventListener('input', () => {
+      const v = pw.value;
+      check('r-len',     v.length >= 12);
+      check('r-upper',   /[A-Z]/.test(v));
+      check('r-lower',   /[a-z]/.test(v));
+      check('r-digit',   /\d/.test(v));
+      check('r-special', /[!@#$%^&*(),.?":{}|<>]/.test(v));
+    });
+    function check(id, ok) {
+      document.getElementById(id).classList.toggle('valid', ok);
+    }
+  </script>
+</body>
+</html>
