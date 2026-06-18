@@ -212,19 +212,27 @@ class ProfileForm(forms.ModelForm):
             if pic.size > 2 * 1024 * 1024:
                 raise ValidationError("Profile picture must be under 2MB.")
 
-            # Extension whitelist
-            import os
-            ext = os.path.splitext(pic.name)[1].lower()
-            if ext not in ['.jpg', '.jpeg', '.png']:
-                raise ValidationError("Only JPG/PNG images are allowed.")
+# Extension whitelist
+import os
 
-            # MIME type validation via python-magic
-            try:
-                mime = magic.from_buffer(pic.read(1024), mime=True)
-                pic.seek(0)
-                if mime not in ['image/jpeg', 'image/png']:
-                    raise ValidationError("File content does not match an allowed image type.")
-            except Exception:
-                pass  # If magic fails, fall back to extension check
+ext = os.path.splitext(pic.name)[1].lower()
 
-        return pic
+if ext not in ['.jpg', '.jpeg', '.png']:
+    raise ValidationError("Only JPG/PNG images are allowed.")
+
+
+# MIME type validation via python-magic
+try:
+    mime = magic.from_buffer(pic.read(1024), mime=True)
+    pic.seek(0)
+
+    if mime not in ['image/jpeg', 'image/png']:
+        raise ValidationError(
+            "File content does not match an allowed image type."
+        )
+
+except Exception as e:
+    # If python-magic fails, log warning instead of silently ignoring
+    print(f"File validation warning: {e}")
+
+return pic
